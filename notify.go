@@ -2,7 +2,6 @@ package hdz
 
 import (
 	"context"
-	"fmt"
 	json "github.com/json-iterator/go"
 	"io"
 	"net/http"
@@ -32,12 +31,30 @@ var (
 	}
 )
 
+type NotifyHandlers interface {
+	onCreate(ctx context.Context, orderNo string, body *CreateOrderResponse) error
+
+	onApproval(ctx context.Context, orderNo string, body *ApprovalOrderResponse) error
+
+	onLoanApply(ctx context.Context, orderNo string, body []byte) error
+
+	onLoan(ctx context.Context, orderNo string, body *OrderLoanResponse) error
+
+	onCheckAgreement(ctx context.Context, orderNo string, body []byte) error
+}
+
+var notifyHandlers NotifyHandlers
+
 func init() {
 	handlers["APPLY_CREATE_STATUS"] = OnCreate         // 订单创建
 	handlers["APPROVAL_RESULT"] = OnApproval           // 订单审批
 	handlers["LOAN_APPLY"] = OnLoanApply               // 申请放款
 	handlers["LOAN_RESULT"] = OnLoan                   // 放款成功
 	handlers["USER_CHECKS_AGREEMENT"] = CheckAgreement // 放款成功
+}
+
+func RegisterNotifyHandlers(handlers NotifyHandlers) {
+	notifyHandlers = handlers
 }
 
 // Notify
@@ -89,8 +106,10 @@ func OnCreate(ctx context.Context, orderNo string, msg []byte) error {
 	if err := json.Unmarshal(msg, result); err != nil {
 		return err
 	}
-
-	return nil
+	if notifyHandlers == nil {
+		return nil
+	}
+	return notifyHandlers.onCreate(ctx, orderNo, result)
 }
 
 // OnApproval
@@ -101,18 +120,20 @@ func OnApproval(ctx context.Context, orderNo string, msg []byte) error {
 		return err
 	}
 
-	mapping, ok := approvalStatusMappingText[result.Result]
-	if !ok {
+	if notifyHandlers == nil {
 		return nil
 	}
-
-	fmt.Println(mapping)
-	return nil
+	return notifyHandlers.onApproval(ctx, orderNo, result)
 }
 
 // OnLoanApply
 // @date: 2022-03-24 01:13:59
-func OnLoanApply(ctx context.Context, orderNo string, msg []byte) error { return nil }
+func OnLoanApply(ctx context.Context, orderNo string, msg []byte) error {
+	if notifyHandlers == nil {
+		return nil
+	}
+	return notifyHandlers.onLoanApply(ctx, orderNo, msg)
+}
 
 // OnLoan
 // @date: 2022-03-24 01:14:01
@@ -122,7 +143,10 @@ func OnLoan(ctx context.Context, orderNo string, msg []byte) error {
 		return err
 	}
 
-	return nil
+	if notifyHandlers == nil {
+		return nil
+	}
+	return notifyHandlers.onLoan(ctx, orderNo, result)
 }
 
 // CheckAgreement
@@ -130,7 +154,9 @@ func OnLoan(ctx context.Context, orderNo string, msg []byte) error {
 // @param orderNo
 // @param _
 // @date 2022-09-21 16:24:23
-func CheckAgreement(ctx context.Context, orderNo string, _ []byte) error {
-
-	return nil
+func CheckAgreement(ctx context.Context, orderNo string, msg []byte) error {
+	if notifyHandlers == nil {
+		return nil
+	}
+	return notifyHandlers.onCheckAgreement(ctx, orderNo, msg)
 }
