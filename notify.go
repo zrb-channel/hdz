@@ -21,15 +21,15 @@ var (
 )
 
 type NotifyHandlers interface {
-	onCreate(ctx context.Context, orderNo string, body *CreateOrderResponse) error
+	OnCreate(ctx context.Context, orderNo string, body *CreateOrderResponse) error
 
-	onApproval(ctx context.Context, orderNo string, body *ApprovalOrderResponse) error
+	OnApproval(ctx context.Context, orderNo string, body *ApprovalOrderResponse) error
 
-	onLoanApply(ctx context.Context, orderNo string, body []byte) error
+	OnLoanApply(ctx context.Context, orderNo string, body []byte) error
 
-	onLoan(ctx context.Context, orderNo string, body *OrderLoanResponse) error
+	OnLoan(ctx context.Context, orderNo string, body *OrderLoanResponse) error
 
-	onCheckAgreement(ctx context.Context, orderNo string, body []byte) error
+	OnCheckAgreement(ctx context.Context, orderNo string, body []byte) error
 }
 
 var notifyHandlers NotifyHandlers
@@ -98,7 +98,7 @@ func OnCreate(ctx context.Context, orderNo string, msg []byte) error {
 	if notifyHandlers == nil {
 		return nil
 	}
-	return notifyHandlers.onCreate(ctx, orderNo, result)
+	return notifyHandlers.OnCreate(ctx, orderNo, result)
 }
 
 // OnApproval
@@ -112,7 +112,7 @@ func OnApproval(ctx context.Context, orderNo string, msg []byte) error {
 	if notifyHandlers == nil {
 		return nil
 	}
-	return notifyHandlers.onApproval(ctx, orderNo, result)
+	return notifyHandlers.OnApproval(ctx, orderNo, result)
 }
 
 // OnLoanApply
@@ -121,7 +121,7 @@ func OnLoanApply(ctx context.Context, orderNo string, msg []byte) error {
 	if notifyHandlers == nil {
 		return nil
 	}
-	return notifyHandlers.onLoanApply(ctx, orderNo, msg)
+	return notifyHandlers.OnLoanApply(ctx, orderNo, msg)
 }
 
 // OnLoan
@@ -135,7 +135,7 @@ func OnLoan(ctx context.Context, orderNo string, msg []byte) error {
 	if notifyHandlers == nil {
 		return nil
 	}
-	return notifyHandlers.onLoan(ctx, orderNo, result)
+	return notifyHandlers.OnLoan(ctx, orderNo, result)
 }
 
 // CheckAgreement
@@ -147,5 +147,5 @@ func CheckAgreement(ctx context.Context, orderNo string, msg []byte) error {
 	if notifyHandlers == nil {
 		return nil
 	}
-	return notifyHandlers.onCheckAgreement(ctx, orderNo, msg)
+	return notifyHandlers.OnCheckAgreement(ctx, orderNo, msg)
 }
