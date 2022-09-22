@@ -18,17 +18,6 @@ type (
 
 var (
 	handlers = make(map[string]HandlerFunc)
-
-	// 状态 0:审批中 1:审批成功 2:佣金待提现 3:不符合支付要求 4:审批失败 5:佣金已提现 6.已拒绝
-	approvalStatusMappingText = map[string]*ApprovalStatus{
-		"0": {Text: "审批中", State: 0},
-		"1": {Text: "通过", State: 1},
-		"2": {Text: "拒绝", State: 6},
-		"3": {Text: "终止", State: 6},
-		"4": {Text: "挂起", State: 0},
-		"5": {Text: "待资料采集", State: 0},
-		"6": {Text: "申请中", State: 0},
-	}
 )
 
 type NotifyHandlers interface {
@@ -60,7 +49,7 @@ func RegisterNotifyHandlers(handlers NotifyHandlers) {
 // Notify
 // @param req
 // @date 2022-09-21 16:31:29
-func Notify(req http.Request) error {
+func Notify(req *http.Request) error {
 	base := &NotifyBaseResponse{}
 
 	body, err := io.ReadAll(req.Body)
