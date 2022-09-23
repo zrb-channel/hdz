@@ -14,6 +14,9 @@ import (
 // @param body
 // @date 2022-09-21 16:23:46
 func CreateOrder(ctx context.Context, conf *Config, orderNo string, body *CreateOrderRequest) (*CreateOrderResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 
 	req := BaseRequest[*CreateOrderRequest]{
 		EventType:      "APPLY_CREATE",

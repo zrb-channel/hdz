@@ -1,14 +1,13 @@
 package hdz
 
 import (
-	"context"
 	"fmt"
 	"github.com/zrb-channel/utils/hash"
 )
 
 // Login
 // @date: 2022-03-24 10:29:26
-func Login(ctx context.Context, conf *Config, mobile, orderNo string) string {
+func Login(conf *Config, mobile, orderNo string) string {
 
 	req := &LoginRequest{
 		AppID:          conf.LoginAppId,

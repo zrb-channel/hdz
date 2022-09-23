@@ -50,6 +50,11 @@ func RegisterNotifyHandlers(handlers NotifyHandlers) {
 // @param req
 // @date 2022-09-21 16:31:29
 func Notify(req *http.Request) error {
+	ctx := req.Context()
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
 	base := &NotifyBaseResponse{}
 
 	body, err := io.ReadAll(req.Body)
@@ -61,7 +66,6 @@ func Notify(req *http.Request) error {
 		return err
 	}
 
-	ctx := req.Context()
 	handler, ok := handlers[base.EventType]
 	if ok {
 		return handler(ctx, base.OrderNo, base.Data)
