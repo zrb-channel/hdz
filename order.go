@@ -3,7 +3,6 @@ package hdz
 import (
 	"context"
 	"errors"
-	"github.com/zrb-channel/hdz/config"
 	"github.com/zrb-channel/utils"
 
 	json "github.com/json-iterator/go"
@@ -14,7 +13,7 @@ import (
 // @param orderNo
 // @param body
 // @date 2022-09-21 16:23:46
-func CreateOrder(ctx context.Context, orderNo string, body *CreateOrderRequest) (*CreateOrderResponse, error) {
+func CreateOrder(ctx context.Context, conf *Config, orderNo string, body *CreateOrderRequest) (*CreateOrderResponse, error) {
 
 	req := BaseRequest[*CreateOrderRequest]{
 		EventType:      "APPLY_CREATE",
@@ -24,14 +23,14 @@ func CreateOrder(ctx context.Context, orderNo string, body *CreateOrderRequest) 
 
 	headers := map[string]string{
 		"Content-Type":  "application/json; charset=utf-8",
-		"Authorization": config.Token,
-		"App-Id":        config.AppID,
+		"Authorization": conf.Token,
+		"App-Id":        conf.AppId,
 	}
 
 	resp, err := utils.Request(ctx).
 		SetBody(req).
 		SetHeaders(headers).
-		Post(config.Addr)
+		Post(Addr)
 
 	if err != nil {
 		return nil, err
