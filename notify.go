@@ -3,8 +3,6 @@ package hdz
 import (
 	"context"
 	json "github.com/json-iterator/go"
-	"io"
-	"net/http"
 )
 
 type (
@@ -49,20 +47,14 @@ func RegisterNotifyHandlers(handlers NotifyHandlers) {
 // Notify
 // @param req
 // @date 2022-09-21 16:31:29
-func Notify(req *http.Request) error {
-	ctx := req.Context()
+func Notify(ctx context.Context, req []byte) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
 
 	base := &NotifyBaseResponse{}
 
-	body, err := io.ReadAll(req.Body)
-	if err != nil {
-		return err
-	}
-
-	if err = json.Unmarshal(body, base); err != nil {
+	if err := json.Unmarshal(req, base); err != nil {
 		return err
 	}
 
